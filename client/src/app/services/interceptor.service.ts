@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 const TOKEN_HEADER_KEY = 'x-access-token';
 
 @Injectable()
-export class MyInterceptor implements HttpInterceptor {
+export class Interceptor implements HttpInterceptor {
   constructor(private _token: TokenStorageService) {}
 
   intercept(
@@ -32,5 +32,5 @@ export class MyInterceptor implements HttpInterceptor {
 }
 
 export const authInterceptorProviders = [
-  { provide: HTTP_INTERCEPTORS, useClass: MyInterceptor, multi: true },
+  { provide: HTTP_INTERCEPTORS, useClass: Interceptor, multi: true },
 ];
