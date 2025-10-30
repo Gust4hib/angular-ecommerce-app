@@ -41,7 +41,7 @@ services:
       - app-network
 
   frontend:
-    image: pedrobrantis/frontend:deploy
+    image: gustoker/frontend:dev
     container_name: frontend
     depends_on:
       backend:

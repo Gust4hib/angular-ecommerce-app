@@ -1,0 +1,69 @@
+# .github/workflows/deploy-frontend.yml
+
+name: Deploy Frontend CI/CD
+
+# ISSO É O "GATILHO"
+# O robô vai rodar sempre que você der 'git push' na sua branch 'main'
+# Mude 'main' para 'master' se a sua branch principal tiver esse nome.
+on:
+  push:
+    branches:
+      - main
+    # Isso faz com que o robô só rode se você mudar algo na pasta 'client'
+    paths:
+      - 'client/**'
+
+# Isso define o nome da sua imagem para usarmos depois
+env:
+  IMAGE_NAME: gustoker/frontend:dev
+
+# ISSO SÃO OS "TRABALHOS"
+jobs:
+  # TRABALHO 1: Construir a imagem e enviar para o Docker Hub
+  build_and_push:
+    runs-on: ubuntu-latest # O robô vai rodar em um Linux virtual
+    
+    steps:
+      # 1. Baixa o seu código para a máquina do robô
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Faz login no Docker Hub (usando os Secrets)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Constrói a imagem (o mesmo comando que você rodou)
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }} -f client/Dockerfile ./client
+
+      # 4. Envia a imagem para o Docker Hub
+      - name: Push image to Docker Hub
+        run: |
+          docker push ${{ env.IMAGE_NAME }}
+
+  # TRABALHO 2: Atualizar o Kubernetes (Deployment)
+  # Este trabalho só roda DEPOIS que o 'build_and_push' terminar com sucesso
+  deploy:
+    needs: build_and_push # Depende do trabalho anterior
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Instala o 'kubectl' na máquina do robô
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      # 2. O passo mágico: Pega o seu KUBE_CONFIG_DATA (a string gigante)
+      #    decodifica de Base64 e salva como um arquivo para o kubectl usar
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+          
+      # 4. Finalmente, roda o comando de rollout que você rodou manualmente
+      - name: Deploy to K3s (Rollout Restart)
+        run: |
+          kubectl rollout restart deployment/frontend -n app-demo
