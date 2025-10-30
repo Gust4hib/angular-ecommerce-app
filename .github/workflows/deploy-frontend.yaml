@@ -28,19 +28,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Faz login no Docker Hub (usando os Secrets)
+      # O robô vai entrar na pasta 'client', instalar as dependências
+      # e rodar os testes. Se 'npm test' falhar, a pipeline para AQUI.
+      - name: Install Dependencies and Run Tests
+        working-directory: ./client
+        run: |
+          npm install --legacy-peer-deps
+          npm test -- --watch=false --browsers=ChromeHeadless
+      # --------------------------------------------------------------------
+
+      # 2. Faz login no Docker Hub (só acontece se os testes passarem)
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. Constrói a imagem (o mesmo comando que você rodou)
+      # 3. Constrói a imagem (só acontece se os testes passarem)
       - name: Build Docker image
         run: |
           docker build -t ${{ env.IMAGE_NAME }} -f client/Dockerfile ./client
 
-      # 4. Envia a imagem para o Docker Hub
+      # 4. Envia a imagem para o Docker Hub (só acontece se os testes passarem)
       - name: Push image to Docker Hub
         run: |
           docker push ${{ env.IMAGE_NAME }}
