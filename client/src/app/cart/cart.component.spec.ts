@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { CartComponent } from './cart.component';
 
 describe('CartComponent', () => {
@@ -8,7 +8,8 @@ describe('CartComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CartComponent ]
+      declarations: [ CartComponent ],
+      imports: [ NzNotificationModule ]
     })
     .compileComponents();
   });
