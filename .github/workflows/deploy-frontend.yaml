@@ -8,7 +8,7 @@ name: Deploy Frontend CI/CD
 on:
   push:
     branches:
-      - main
+      - master
     # Isso faz com que o robô só rode se você mudar algo na pasta 'client'
     paths:
       - 'client/**'
