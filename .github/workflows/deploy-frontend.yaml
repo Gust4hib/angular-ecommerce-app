@@ -28,28 +28,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # O robô vai entrar na pasta 'client', instalar as dependências
-      # e rodar os testes. Se 'npm test' falhar, a pipeline para AQUI.
+      # Diz ao robô para usar o Node.js v16, que é o que seu projeto usa
+      - name: Set up Node.js v16
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      # --------------------------------------------------------------------
+
+      # 2. Passo de QA: Instala e Roda Testes (agora com o Node 16)
       - name: Install Dependencies and Run Tests
         working-directory: ./client
         run: |
           npm install --legacy-peer-deps
           npm test -- --watch=false --browsers=ChromeHeadless
-      # --------------------------------------------------------------------
 
-      # 2. Faz login no Docker Hub (só acontece se os testes passarem)
+      # 3. Faz login no Docker Hub (só acontece se os testes passarem)
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. Constrói a imagem (só acontece se os testes passarem)
+      # 4. Constrói a imagem (só acontece se os testes passarem)
       - name: Build Docker image
         run: |
           docker build -t ${{ env.IMAGE_NAME }} -f client/Dockerfile ./client
 
-      # 4. Envia a imagem para o Docker Hub (só acontece se os testes passarem)
+      # 5. Envia a imagem para o Docker Hub (só acontece se os testes passarem)
       - name: Push image to Docker Hub
         run: |
           docker push ${{ env.IMAGE_NAME }}
