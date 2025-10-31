@@ -66,7 +66,7 @@ exports.registerUser = async (params) => {
         } else if (result.length === 0) {
           db.query(
             `INSERT INTO users (fname, email, password) VALUES (?,?,?)`,
-            [fullName, email, hashedPassword],
+            [fullName, email, hashedPassword, fullname],
             (err, result) => {
               if (err) {
                 reject({
