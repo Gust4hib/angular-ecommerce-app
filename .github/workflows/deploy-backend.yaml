@@ -30,7 +30,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           # (ATENÇÃO: Verifique se o nome do seu secret é DOKERHUB_TOKEN ou DOCKERHUB_TOKEN)
-          password: ${{ secrets.DOKERHUB_TOKEN }} 
+          password: ${{ secrets.DOCKERHUB_TOKEN }} 
 
       # MUDANÇA: Aponta para o Dockerfile e contexto do backend
       - name: Build Docker image
