@@ -25,6 +25,7 @@ exports.register_user = async (req, res, next) => {
     })
     .catch((err) => {
       const { statusCode = 400, message, data } = err;
+      console.error('[REGISTRO FALHOU]', message, data);
       res.status(statusCode).send({ message, data }) && next(err);
     });
 };
