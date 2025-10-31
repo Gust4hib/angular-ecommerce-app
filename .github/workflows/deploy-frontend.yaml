@@ -81,3 +81,13 @@ jobs:
       - name: Deploy to K3s (Rollout Restart)
         run: |
           kubectl set image deployment/frontend web=${{ env.IMAGE_NAME }} -n app-demo
+
+      # MUDANÇA: Adiciona verificação (Health Check)
+      - name: Verificar se o Frontend está online
+        run: |
+          echo "Aguardando 15 segundos para o pod novo subir..."
+          sleep 15
+          echo "Testando o endpoint do Frontend (Porta 30080)..."
+          # A flag -f faz o 'curl' falhar se o site der erro (ex: 404, 503)
+          curl -f -s -o /dev/null http://3.152.158.167:30080
+          echo "✅ Frontend está respondendo!"
