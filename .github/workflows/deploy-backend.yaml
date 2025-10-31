@@ -1,0 +1,60 @@
+# .github/workflows/deploy-backend.yml
+
+name: Deploy Backend CI/CD
+
+on:
+  push:
+    branches:
+      - master
+    # GATILHO: Agora reage a mudanças na pasta 'backend/'
+    paths:
+      - 'backend/**'
+
+# MUDANÇA: O nome da imagem agora é 'backend'
+env:
+  IMAGE_NAME: gustoker/backend:${{ github.sha }}
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Não precisamos do 'Set up Node.js' aqui, 
+      # pois o Dockerfile do backend já cuida da versão do Node.
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          # (ATENÇÃO: Verifique se o nome do seu secret é DOKERHUB_TOKEN ou DOCKERHUB_TOKEN)
+          password: ${{ secrets.DOKERHUB_TOKEN }} 
+
+      # MUDANÇA: Aponta para o Dockerfile e contexto do backend
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }} -f backend/Dockerfile ./backend
+
+      - name: Push image to Docker Hub
+        run: |
+          docker push ${{ env.IMAGE_NAME }}
+
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+          
+      # MUDANÇA: Atualiza o 'deployment/backend' e o container 'app'
+      - name: Deploy to K3s (Set new image)
+        run: |
+          kubectl set image deployment/backend app=${{ env.IMAGE_NAME }} -n app-demo
