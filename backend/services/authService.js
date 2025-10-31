@@ -65,8 +65,8 @@ exports.registerUser = async (params) => {
           });
         } else if (result.length === 0) {
           db.query(
-            `INSERT INTO users (fname, email, password) VALUES (?,?,?)`,
-            [fullName, email, hashedPassword, fullname],
+            `INSERT INTO users (fullname, email, password) VALUES (?,?,?)`,
+            [fullName, email, hashedPassword],
             (err, result) => {
               if (err) {
                 reject({
