@@ -62,8 +62,8 @@ jobs:
       # MUDANÇA: Adiciona verificação (Health Check) backend
       - name: Verificar se o Backend está online
         run: |
-          echo "Aguardando 15 segundos para o pod novo subir..."
-          sleep 15
+          echo "Aguardando 45 segundos para o pod novo subir..."
+          sleep 45
           echo "Testando o endpoint do Backend (Porta 30020)..."
           # A flag -f faz o 'curl' falhar se o site der erro (ex: 404, 503)
           # (Estou testando a raiz '/', mas você pode mudar para '/api/v1/products' se preferir)
