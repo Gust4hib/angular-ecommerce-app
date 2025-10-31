@@ -15,7 +15,7 @@ on:
 
 # Isso define o nome da sua imagem para usarmos depois
 env:
-  IMAGE_NAME: gustoker/frontend:dev
+  IMAGE_NAME: gustoker/frontend:${{ github.sha }}
 
 # ISSO SÃO OS "TRABALHOS"
 jobs:
@@ -80,4 +80,4 @@ jobs:
       # 4. Finalmente, roda o comando de rollout que você rodou manualmente
       - name: Deploy to K3s (Rollout Restart)
         run: |
-          kubectl rollout restart deployment/frontend -n app-demo
+          kubectl set image deployment/frontend web=${{ env.IMAGE_NAME }} -n app-demo
