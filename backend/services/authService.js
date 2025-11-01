@@ -52,6 +52,9 @@ exports.registerUser = async (params) => {
 
   const { fullName, email, password } = params;
   const hashedPassword = md5(password.toString());
+  const nameParts = fullName.split(' ');
+  const fname = nameParts.shift();
+  const lname = nameParts.join(' ');
 
   return new Promise((resolve, reject) => {
     db.query(
@@ -65,8 +68,8 @@ exports.registerUser = async (params) => {
           });
         } else if (result.length === 0) {
           db.query(
-            `INSERT INTO users (fname, email, password, username) VALUES (?,?,?,?)`,
-            [fullName, email, hashedPassword, fullName],
+            `INSERT INTO users (fname, lname, email, password, username) VALUES (?,?,?,?,?)`,
+            [fname, lname, email, hashedPassword, fullName],
             (err, result) => {
               if (err) {
                 reject({
