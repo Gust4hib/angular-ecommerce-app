@@ -6,6 +6,7 @@ const cors = require("cors");
 
 // Config development.env file
 //testando a pipeline backend
+//teste de pipeline
 dotenv.config({
   path: path.join(__dirname, `env/${process.env.NODE_ENV}.env`),
 });
