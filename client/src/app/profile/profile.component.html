@@ -10,12 +10,13 @@
     ></nz-alert>
     <form (ngSubmit)="onSubmit()">
       <div class="input-container" *ngFor="let field of user">
-        <label for="field.key">{{ field.label }}</label>
+        <label [for]="field.key">{{ field.label }}</label>
         <input
           nz-input
+          [id]="field.key"
           [name]="field.key"
           [type]="field.type"
-          [(value)]="field.value"
+          [autocomplete]="field.key"
           [(ngModel)]="field.value"
         />
       </div>
